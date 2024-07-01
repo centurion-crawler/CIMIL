@@ -1,0 +1,41 @@
+gpu_id: 0
+fi: 0 # fold i
+mu: 0.02
+cluster:
+  train_dir: /data12/zzf/MIL/CM16_256/train_patches/pkl_bak #train set dir
+  pre_max_level: 2
+  ks: [10,5,4]
+  seed: 0
+Warmup:
+  epoch: 100
+  batch_size: 4
+  early_stop: 20
+  weight_decay: 5e-4
+  lr: 1e-4
+
+HIS:
+  max_level: 3
+  P_low_bound: 0.02
+  pos_threshold: 0.75
+  diff_threshold: 5.e-3
+  ckpt_path: <path to warm up ckpt_path>
+Projector:
+  classes: 2
+  epoch: 20
+  early_stop: 8
+  batch_size: 512
+  creiterion: focal
+  focal_alpha: [0.2,0.8] # patch二分类 focal weight
+  lr: 1e-4
+  weight_decay: 5e-4
+  pseudo_idx_path: ./Pseudo_label_0.02_c_10_f_0.pkl       # <path to Pseudo_label> ./Pseudo_label_{mu}_c_{c_num}_f_{fi}.pkl
+  res_train: <path to train instance softmax res>
+  res_test: <path to test instance softmax res>
+Refine:
+  epoch: 130
+  early_stop: 40
+  batch_size: 4
+  focal_alpha: [0.5,0.5] # WSI二分类 focal weight
+  prj_weight: <path to projector weight>
+  begin_to_save_epoch_rate: 0.2
+  creiterion: cross-entropy
